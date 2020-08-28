@@ -1,5 +1,8 @@
 using Pkg
-Pkg.activate(".")
+cd(@__DIR__)
+Pkg.activate("./")
+Pkg.instantiate()
+
 using BenchmarkTools
 using Distributed
 @everywhere using CxxWrap
@@ -74,8 +77,8 @@ function main()
 	# let's start with reading a number of files concurrently
 	fnames = RemoteChannel(()->Channel{String}(400))
 
-	# let's presume we can process up to 2000 events concurrently
-	events = RemoteChannel(()->Channel(200000))
+	# let's make a buffer large enough for up to 2000 events concurrently
+	events = RemoteChannel(()->Channel(2000))
 
 	# the readers can signal when they are done reading events
 	done = RemoteChannel(()->Channel{Int}(400))
@@ -102,8 +105,8 @@ function main()
 	nDone = 0
 	nEvents = 0
 	while nDone != nworkers()
-		nDone += 1
 		nEvents += take!(done)
+		nDone += 1
 	end
 	close(events)
 

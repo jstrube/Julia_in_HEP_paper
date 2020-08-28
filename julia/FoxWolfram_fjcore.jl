@@ -1,5 +1,8 @@
 using Pkg
-Pkg.activate(".")
+cd(@__DIR__)
+Pkg.activate("./")
+Pkg.instantiate()
+
 using CxxWrap
 using LinearAlgebra
 using Plots
